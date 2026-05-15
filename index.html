@@ -4,27 +4,67 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>10 Full-Width Color Bars</title>
-  <style>
-    .color-bar {
-      width: 100%;
-      height: 300px;
-    }
-    .red   { background: red; }
-    .orange{ background: orange; }
-    .yellow{ background: yellow; }
-    .green { background: green; }
-    .blue  { background: blue; }
-    .indigo{ background: indigo; }
-    .violet{ background: violet; }
-    .pink  { background: hotpink; }
-    .teal  { background: teal; }
-    .gray  { background: gray; }
-  </style>
+  <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
-  <div class="color-bar red"></div>
-  <div class="color-bar orange"></div>
-  <div class="color-bar yellow"></div>
+  <div class="color-bar red">
+    <div class="black-box"></div>
+    <div class="black-box"></div>
+    <div class="black-box"></div>
+    <div class="black-box"></div>
+    <div class="black-box"></div>
+    <div class="black-box"></div>
+    <div class="black-box"></div>
+    <div class="black-box"></div>
+    <div class="black-box"></div>
+    <div class="black-box"></div>
+  </div>
+  <div class="color-bar orange">
+    <div class="line"></div>
+    <div class="line"></div>
+    <div class="line"></div>
+    <div class="line"></div>
+    <div class="line"></div>
+    <div class="line"></div>
+    <div class="line"></div>
+    <div class="line"></div>
+    <div class="line"></div>
+    <div class="line"></div>
+    <div class="line"></div>
+    <div class="line"></div>
+    <div class="line"></div>
+    <div class="line"></div>
+    <div class="line"></div>
+    <div class="line"></div>
+    <div class="line"></div>
+    <div class="line"></div>
+    <div class="line"></div>
+    <div class="line"></div>
+  </div>
+  <div class="color-bar yellow">
+    <div class="shape-3d-wrapper">
+      <div class="line3d"></div>
+      <div class="line3d"></div>
+      <div class="line3d"></div>
+      <div class="line3d"></div>
+      <div class="line3d"></div>
+      <div class="line3d"></div>
+      <div class="line3d"></div>
+      <div class="line3d"></div>
+      <div class="line3d"></div>
+      <div class="line3d"></div>
+      <div class="line3d"></div>
+      <div class="line3d"></div>
+      <div class="line3d"></div>
+      <div class="line3d"></div>
+      <div class="line3d"></div>
+      <div class="line3d"></div>
+      <div class="line3d"></div>
+      <div class="line3d"></div>
+      <div class="line3d"></div>
+      <div class="line3d"></div>
+    </div>
+  </div>
   <div class="color-bar green"></div>
   <div class="color-bar blue"></div>
   <div class="color-bar indigo"></div>
@@ -32,5 +72,341 @@
   <div class="color-bar pink"></div>
   <div class="color-bar teal"></div>
   <div class="color-bar gray"></div>
+
+  <script>
+    // --- Snake Animation in Red Div ---
+    const redDiv = document.querySelector('.color-bar.red');
+    const blackBoxes = Array.from(redDiv.querySelectorAll('.black-box'));
+    const boxSize = 10;
+    
+    // Initialize snake body coordinates: Head is index 0, tail is index 9
+    let snake = blackBoxes.map((_, i) => ({ x: (9 - i) * boxSize, y: 0 }));
+    let dx = boxSize; // Start moving right
+    let dy = 0;
+
+    function animateSnake() {
+      // Determine boundaries dynamically based on window width
+      const maxX = Math.floor(redDiv.clientWidth / boxSize) * boxSize - boxSize;
+      const maxY = Math.floor(redDiv.clientHeight / boxSize) * boxSize - boxSize;
+
+      // 10% chance per frame to randomly change direction
+      if (Math.random() < 0.1) {
+        const isHorizontal = dx !== 0;
+        if (isHorizontal) {
+          dx = 0;
+          dy = (Math.random() < 0.5 ? 1 : -1) * boxSize;
+        } else {
+          dy = 0;
+          dx = (Math.random() < 0.5 ? 1 : -1) * boxSize;
+        }
+      }
+
+      let nextX = snake[0].x + dx;
+      let nextY = snake[0].y + dy;
+
+      // Boundary Check: if about to hit the left or right wall, force a turn up/down
+      if (nextX < 0 || nextX > maxX) {
+        dx = 0;
+        dy = (Math.random() < 0.5 ? 1 : -1) * boxSize;
+        if (snake[0].y + dy < 0) dy = boxSize;
+        if (snake[0].y + dy > maxY) dy = -boxSize;
+        nextX = snake[0].x + dx;
+        nextY = snake[0].y + dy;
+      }
+
+      // Boundary Check: if about to hit the top or bottom wall, force a turn left/right
+      if (nextY < 0 || nextY > maxY) {
+        dy = 0;
+        dx = (Math.random() < 0.5 ? 1 : -1) * boxSize;
+        if (snake[0].x + dx < 0) dx = boxSize;
+        if (snake[0].x + dx > maxX) dx = -boxSize;
+        nextX = snake[0].x + dx;
+        nextY = snake[0].y + dy;
+      }
+
+      // Failsafe clamp to edges
+      nextX = Math.max(0, Math.min(nextX, maxX));
+      nextY = Math.max(0, Math.min(nextY, maxY));
+
+      // Shift body segments forward (tail to neck)
+      for (let i = snake.length - 1; i > 0; i--) {
+        snake[i].x = snake[i - 1].x;
+        snake[i].y = snake[i - 1].y;
+      }
+
+      // Apply new head position
+      snake[0].x = nextX;
+      snake[0].y = nextY;
+
+      // Render snake onto screen
+      blackBoxes.forEach((box, i) => {
+        box.style.left = snake[i].x + 'px';
+        box.style.top = snake[i].y + 'px';
+      });
+    }
+
+    // Run the animation loop every 100 milliseconds
+    setInterval(animateSnake, 100);
+
+    // --- Shape Animation in Orange Div ---
+    window.addEventListener('load', () => {
+      const orangeDiv = document.querySelector('.color-bar.orange');
+      const lines = Array.from(orangeDiv.querySelectorAll('.line'));
+      if (lines.length === 0) return; // Don't run if lines aren't there
+
+      const containerWidth = orangeDiv.clientWidth;
+      const containerHeight = orangeDiv.clientHeight;
+      const shapes = [];
+      let currentShapeIndex = 0;
+
+      function defineShapes() {
+        const w = containerWidth;
+        const h = containerHeight;
+        const cx = w / 2;
+        const cy = h / 2;
+        const size = Math.min(w, h) * 0.7; // Max shape size based on container
+        const half = size / 2;
+
+        // --- RECTANGLE ---
+        const rectLines = [];
+        const numLinesPerSide = 5; // 20 lines / 4 sides
+        const segment = size / numLinesPerSide;
+
+        // Top side
+        for (let i = 0; i < numLinesPerSide; i++) rectLines.push({ x: cx - half + i * segment, y: cy - half, width: segment, angle: 0 });
+        // Right side
+        for (let i = 0; i < numLinesPerSide; i++) rectLines.push({ x: cx + half, y: cy - half + i * segment, width: segment, angle: 90 });
+        // Bottom side (drawn right-to-left)
+        for (let i = 0; i < numLinesPerSide; i++) rectLines.push({ x: cx + half - (i * segment), y: cy + half, width: segment, angle: 180 });
+        // Left side (drawn bottom-to-top)
+        for (let i = 0; i < numLinesPerSide; i++) rectLines.push({ x: cx - half, y: cy + half - (i * segment), width: segment, angle: -90 });
+        shapes.push(rectLines);
+
+        // --- TRIANGLE ---
+        const triLines = [];
+        const triHeight = size * 0.866; // Height of an equilateral triangle
+        const triBaseWidth = size;
+        // Centering the triangle vertically
+        const p1 = { x: cx - triBaseWidth / 2, y: cy + triHeight / 2 }; // bottom-left
+        const p2 = { x: cx, y: cy - triHeight / 2 }; // top
+        const p3 = { x: cx + triBaseWidth / 2, y: cy + triHeight / 2 }; // bottom-right
+
+        const baseLineCount = 7, leftLineCount = 7, rightLineCount = 6; // Sums to 20
+        
+        // Base
+        let dx = (p3.x - p1.x) / baseLineCount;
+        for (let i = 0; i < baseLineCount; i++) triLines.push({ x: p1.x + i * dx, y: p1.y, width: dx, angle: 0 });
+        
+        // Left side
+        dx = (p2.x - p1.x) / leftLineCount;
+        let dy = (p2.y - p1.y) / leftLineCount;
+        let segmentLength = Math.sqrt(dx * dx + dy * dy);
+        let segmentAngle = Math.atan2(dy, dx) * 180 / Math.PI;
+        for (let i = 0; i < leftLineCount; i++) triLines.push({ x: p1.x + i * dx, y: p1.y + i * dy, width: segmentLength, angle: segmentAngle });
+
+        // Right side
+        dx = (p3.x - p2.x) / rightLineCount;
+        dy = (p3.y - p2.y) / rightLineCount;
+        segmentLength = Math.sqrt(dx * dx + dy * dy);
+        segmentAngle = Math.atan2(dy, dx) * 180 / Math.PI;
+        for (let i = 0; i < rightLineCount; i++) triLines.push({ x: p2.x + i * dx, y: p2.y + i * dy, width: segmentLength, angle: segmentAngle });
+        shapes.push(triLines);
+
+        // --- RHOMBUS ---
+        const rhomLines = [];
+        const rhomWidth = size;
+        const rhomHeight = size * 1.2;
+        const rhomLinesPerSide = 5;
+
+        const rp_top = { x: cx, y: cy - rhomHeight / 2 };
+        const rp_right = { x: cx + rhomWidth / 2, y: cy };
+        const rp_bottom = { x: cx, y: cy + rhomHeight / 2 };
+        const rp_left = { x: cx - rhomWidth / 2, y: cy };
+
+        const points = [rp_top, rp_right, rp_bottom, rp_left];
+        for (let j = 0; j < points.length; j++) {
+            const p_start = points[j];
+            const p_end = points[(j + 1) % points.length];
+            dx = (p_end.x - p_start.x) / rhomLinesPerSide;
+            dy = (p_end.y - p_start.y) / rhomLinesPerSide;
+            segmentLength = Math.sqrt(dx * dx + dy * dy);
+            segmentAngle = Math.atan2(dy, dx) * 180 / Math.PI;
+            for (let i = 0; i < rhomLinesPerSide; i++) {
+                rhomLines.push({ x: p_start.x + i * dx, y: p_start.y + i * dy, width: segmentLength, angle: segmentAngle });
+            }
+        }
+        shapes.push(rhomLines);
+      }
+
+      function applyConfiguration(config) {
+        lines.forEach((line, i) => {
+          const conf = config[i];
+          line.style.width = `${conf.width}px`;
+          line.style.transform = `translate(${conf.x}px, ${conf.y}px) rotate(${conf.angle}deg)`;
+        });
+      }
+
+      function breakFormation() {
+        lines.forEach(line => {
+          const x = Math.random() * (containerWidth - 100);
+          const y = Math.random() * (containerHeight - 20);
+          const width = 20 + Math.random() * 80;
+          const angle = Math.random() * 360;
+          line.style.width = `${width}px`;
+          line.style.transform = `translate(${x}px, ${y}px) rotate(${angle}deg)`;
+        });
+      }
+
+      function cycleShapes() {
+        applyConfiguration(shapes[currentShapeIndex]);
+        setTimeout(breakFormation, 5000); // Break the shape after 5 seconds
+        currentShapeIndex = (currentShapeIndex + 1) % shapes.length;
+      }
+
+      // Initialize
+      defineShapes();
+      breakFormation(); // Start in a broken state
+      // After a brief pause for the initial animation, start the main cycle
+      setTimeout(() => {
+        cycleShapes(); // Form the first shape
+        setInterval(cycleShapes, 10000); // Cycle to the next shape every 10 seconds
+      }, 1500);
+    });
+
+    // --- 3D Shape Animation in Yellow Div ---
+    window.addEventListener('load', () => {
+      const yellowDiv = document.querySelector('.color-bar.yellow');
+      if (!yellowDiv) return;
+
+      const shapeWrapper = yellowDiv.querySelector('.shape-3d-wrapper');
+      const lines3D = Array.from(shapeWrapper.querySelectorAll('.line3d'));
+      if (lines3D.length === 0) return;
+
+      const containerWidth = yellowDiv.clientWidth;
+      const containerHeight = yellowDiv.clientHeight;
+      const shapes3D = [];
+      let current3DShapeIndex = 0;
+      let isShapeFormed = false;
+
+      // Helper function to define a 3D line from point A to point B
+      function createLine(p1, p2) {
+        const dx = p2.x - p1.x;
+        const dy = p2.y - p1.y;
+        const dz = p2.z - p1.z;
+        const w = Math.hypot(dx, dy, dz);
+        
+        // Calculate midpoint for centering
+        const cx = (p1.x + p2.x) / 2;
+        const cy = (p1.y + p2.y) / 2;
+        const cz = (p1.z + p2.z) / 2;
+        
+        // Calculate rotations to point the line correctly in 3D space
+        const rotY = Math.atan2(-dz, dx) * 180 / Math.PI;
+        const distXZ = Math.hypot(dx, dz);
+        const rotZ = Math.atan2(dy, distXZ) * 180 / Math.PI;
+        
+        return { w, transform: `translate3d(${cx}px, ${cy}px, ${cz}px) rotateY(${rotY}deg) rotateZ(${rotZ}deg) translateX(-50%)` };
+      }
+
+      function define3DShapes() {
+        const s = Math.min(containerWidth, containerHeight, 250) * 0.35; // Size reference (half of total width)
+
+        // --- WIREFRAME CUBE (12 edges) ---
+        const cube = [];
+        for (let y of [-s, s]) {
+          cube.push(createLine({x:-s, y:y, z:-s}, {x:s, y:y, z:-s})); // Top/bottom front-back edges
+          cube.push(createLine({x:s, y:y, z:-s}, {x:s, y:y, z:s}));
+          cube.push(createLine({x:s, y:y, z:s}, {x:-s, y:y, z:s}));
+          cube.push(createLine({x:-s, y:y, z:s}, {x:-s, y:y, z:-s}));
+        }
+        for (let x of [-s, s]) {
+          for (let z of [-s, s]) {
+            cube.push(createLine({x:x, y:-s, z:z}, {x:x, y:s, z:z})); // 4 vertical pillars
+          }
+        }
+        shapes3D.push(cube);
+
+        // --- WIREFRAME OCTAHEDRON / DIAMOND (12 edges) ---
+        const octa = [];
+        const top = {x:0, y:-s*1.2, z:0}, bot = {x:0, y:s*1.2, z:0};
+        const equator = [{x:s*1.2, y:0, z:0}, {x:0, y:0, z:s*1.2}, {x:-s*1.2, y:0, z:0}, {x:0, y:0, z:-s*1.2}];
+        for (let i = 0; i < 4; i++) {
+          octa.push(createLine(equator[i], equator[(i+1)%4])); // Square equator base
+          octa.push(createLine(top, equator[i])); // Top pyramid connections
+          octa.push(createLine(bot, equator[i])); // Bottom pyramid connections
+        }
+        shapes3D.push(octa);
+
+        // --- WIREFRAME TETRAHEDRON (6 edges) ---
+        const tetra = [];
+        const t1 = {x:s, y:-s, z:s}, t2 = {x:-s, y:-s, z:-s}, t3 = {x:s, y:s, z:-s}, t4 = {x:-s, y:s, z:s};
+        tetra.push(createLine(t1, t2), createLine(t2, t3), createLine(t3, t1));
+        tetra.push(createLine(t1, t4), createLine(t2, t4), createLine(t3, t4));
+        shapes3D.push(tetra);
+      }
+
+      function apply3DConfiguration(config) {
+        isShapeFormed = true;
+        // Center the wrapper containing the lines
+        shapeWrapper.style.transform = `translate3d(${containerWidth / 2}px, ${containerHeight / 2}px, 0)`;
+
+        lines3D.forEach((line, i) => {
+          if (config[i]) {
+            line.style.width = `${config[i].w}px`;
+            line.style.transform = config[i].transform;
+            line.style.opacity = '1';
+          } else {
+            // Hide unused lines if a shape needs fewer than 20
+            line.style.opacity = '0';
+            line.style.width = '0px';
+          }
+        });
+      }
+
+      function break3DFormation() {
+        isShapeFormed = false;
+        shapeWrapper.style.transform = `translate3d(${containerWidth / 2}px, ${containerHeight / 2}px, -200px)`;
+        lines3D.forEach(line => {
+          const x = (Math.random() - 0.5) * containerWidth;
+          const y = (Math.random() - 0.5) * containerHeight;
+          const z = (Math.random() - 0.5) * 1000;
+          const rotX = Math.random() * 360;
+          const rotY = Math.random() * 360;
+          const rotZ = Math.random() * 360;
+          line.style.transform = `translate3d(${x}px, ${y}px, ${z}px) rotateX(${rotX}deg) rotateY(${rotY}deg) rotateZ(${rotZ}deg) translateX(-50%)`;
+          line.style.opacity = '1'; // Make lines visible while scattered
+          line.style.width = `${20 + Math.random() * 60}px`;
+        });
+      }
+
+      function cycle3DShapes() {
+        apply3DConfiguration(shapes3D[current3DShapeIndex]);
+        setTimeout(break3DFormation, 5000);
+        current3DShapeIndex = (current3DShapeIndex + 1) % shapes3D.length;
+      }
+
+      // Continuous rotation animation using requestAnimationFrame for smoothness
+      let rotX = 0, rotY = 0;
+      function animateRotation() {
+        if (isShapeFormed) {
+          rotX += 0.2;
+          rotY += 0.3;
+          const xPos = containerWidth / 2;
+          const yPos = containerHeight / 2;
+          shapeWrapper.style.transform = `translate3d(${xPos}px, ${yPos}px, 0) rotateX(${rotX}deg) rotateY(${rotY}deg)`;
+        }
+        requestAnimationFrame(animateRotation);
+      }
+
+      // Initialize
+      define3DShapes();
+      break3DFormation(); // Start in a broken state
+      animateRotation();  // Start the continuous rotation loop
+      setTimeout(() => {
+        cycle3DShapes();
+        setInterval(cycle3DShapes, 10000);
+      }, 1500);
+    });
+  </script>
 </body>
 </html>

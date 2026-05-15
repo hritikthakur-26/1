@@ -1,0 +1,44 @@
+.color-bar {
+  width: 100%;
+  height: 300px;
+}
+.red   { background: red; position: relative; overflow: hidden; }
+.orange{ background: orange; position: relative; overflow: hidden; }
+.yellow{ background: yellow; position: relative; overflow: hidden; perspective: 1200px; }
+.green { background: green; }
+.blue  { background: blue; }
+.indigo{ background: indigo; }
+.violet{ background: violet; }
+.pink  { background: hotpink; }
+.teal  { background: teal; }
+.gray  { background: gray; }
+.black-box {
+  width: 10px;
+  height: 10px;
+  background: black;
+  position: absolute;
+  border-radius: 2px;
+}
+.line {
+  position: absolute;
+  height: 2px;
+  background-color: black;
+  transform-origin: 0 0; /* Makes rotation happen from the start of the line */
+  transition: transform 1.5s ease-in-out, width 1.5s ease-in-out;
+}
+.shape-3d-wrapper {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  transform-style: preserve-3d;
+  transition: transform 1.5s ease-in-out;
+}
+.line3d {
+  position: absolute;
+  height: 2px;
+  background-color: black;
+  left: 50%;
+  top: 50%;
+  transform-origin: 50% 50%; /* Center origin makes 3D positioning easier */
+  transition: transform 1.5s ease-in-out, width 1.5s ease-in-out, opacity 1.5s ease-in-out;
+}
